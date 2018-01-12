@@ -55,14 +55,17 @@ public final class DriverDataSource implements DataSource
       }
 
       if (driverClassName != null) {
-         Enumeration<Driver> drivers = DriverManager.getDrivers();
+         //Removed the code that always load the class from the DriverManager but instead load
+         // from current classloader if not fall back to the DriverManager
+
+         /*Enumeration<Driver> drivers = DriverManager.getDrivers();
          while (drivers.hasMoreElements()) {
             Driver d = drivers.nextElement();
             if (d.getClass().getName().equals(driverClassName)) {
                driver = d;
                break;
             }
-         }
+         }*/
 
          if (driver == null) {
             LOGGER.warn("Registered driver with driverClassName={} was not found, trying direct instantiation.", driverClassName);
