@@ -46,6 +46,9 @@ public final class DriverDataSource implements DataSource
       this.driverProperties = new Properties();
 
       for (var entry : properties.entrySet()) {
+         // Patch for SNAP-8746 - using #put instead of #setProperty allows driver properties
+         // to retain their type instead of being converted to String. Necessary for support
+         // for private key property for Snowflake JDBC driver.
          driverProperties.put(entry.getKey().toString(), entry.getValue());
       }
 
@@ -57,14 +60,18 @@ public final class DriverDataSource implements DataSource
       }
 
       if (driverClassName != null) {
-         var drivers = DriverManager.getDrivers();
+         // Existing SnapLogic patch, from 2.7.5:
+         //Removed the code that always load the class from the DriverManager but instead load
+         // from current classloader if not fall back to the DriverManager
+
+         /*var drivers = DriverManager.getDrivers();
          while (drivers.hasMoreElements()) {
             var d = drivers.nextElement();
             if (d.getClass().getName().equals(driverClassName)) {
                driver = d;
                break;
             }
-         }
+         }*/
 
          if (driver == null) {
             LOGGER.warn("Registered driver with driverClassName={} was not found, trying direct instantiation.", driverClassName);
